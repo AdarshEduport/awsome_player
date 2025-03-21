@@ -536,26 +536,39 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 // }
 
 - (void)seekTo:(int)location {
-    // Save current rate before pausing
+    // Store current playback rate
     float currentRate = _player.rate;
     _playerRate = currentRate > 0 ? currentRate : _playerRate;
     
-    // When player is playing, pause video, seek to new position and start again
-    bool wasPlaying = _isPlaying;
-    if (wasPlaying) {
-        [_player pause];
+    // Check if player is currently playing
+    BOOL wasPlaying = _isPlaying;
+    
+    // Create seek time
+    CMTime seekTime = CMTimeMake(location, 1000);
+    
+    // Use reasonable tolerance values instead of exact seeking
+    CMTime toleranceBefore = CMTimeMake(250, 1000); // 250ms before
+    CMTime toleranceAfter = CMTimeMake(250, 1000);  // 250ms after
+    
+    // For high-speed playback (like 2x), use larger tolerance
+    if (_playerRate > 1.5) {
+        toleranceBefore = CMTimeMake(500, 1000); // 500ms before
+        toleranceAfter = CMTimeMake(500, 1000);  // 500ms after
     }
-
-    [_player seekToTime:CMTimeMake(location, 1000)
-        toleranceBefore:kCMTimeZero
-         toleranceAfter:kCMTimeZero
+    
+    [_player seekToTime:seekTime
+        toleranceBefore:toleranceBefore
+         toleranceAfter:toleranceAfter
       completionHandler:^(BOOL finished) {
-        if (wasPlaying) {
-            _player.rate = _playerRate;
-        }
-        NSLog(@"Player rate after seek: %f", _player.rate);
+          if (finished && wasPlaying) {
+              // Resume playback with a very slight delay
+              dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                  _player.rate = _playerRate;
+              });
+          }
+          NSLog(@"Player rate after seek: %f", _player.rate);
     }];
-    NSLog(@"Player rate before seek completion: %f", _playerRate);
+    NSLog(@"Player rate11: %f", _playerRate);
 }
 
 - (void)setIsLooping:(bool)isLooping {
