@@ -24,6 +24,7 @@ AVPictureInPictureController *_pipController;
     self = [super init];
     NSAssert(self, @"super init cannot be nil");
     _isInitialized = false;
+    NSLog(@"StateinitWithFrame : %f", _isPlaying);
     _isPlaying = false;
     _disposed = false;
     _player = [[AVPlayer alloc] init];
@@ -70,6 +71,7 @@ AVPictureInPictureController *_pipController;
 
 - (void)clear {
     _isInitialized = false;
+    NSLog(@"Stateclear : %f", _isPlaying);
     _isPlaying = false;
     _disposed = false;
     _failedCount = 0;
@@ -422,16 +424,16 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
     }
 
     if (_isPlaying) {
-        if (@available(iOS 10.0, *)) {
-            [_player playImmediatelyAtRate:1.0];
+
+             [_player play];
             _player.rate = _playerRate;
-        } else {
-            [_player play];
-            _player.rate = _playerRate;
-        }
+                
     } else {
+        
         [_player pause];
     }
+
+  
 }
 
 - (void)onReadyToPlay {
@@ -492,8 +494,10 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (void)pause {
+    NSLog(@"Statepause : %f", _isPlaying);
     _isPlaying = false;
     [self updatePlayingState];
+     
 }
 
 - (int64_t)position {
@@ -518,58 +522,22 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
     return [BetterPlayerTimeUtils FLTCMTimeToMillis:(time)];
 }
 
-// - (void)seekTo:(int)location {
-//     ///When player is playing, pause video, seek to new position and start again. This will prevent issues with seekbar jumps.
-//     bool wasPlaying = _isPlaying;
-//     if (wasPlaying){
-//         [_player pause];
-//     }
-
-//     [_player seekToTime:CMTimeMake(location, 1000)
-//         toleranceBefore:kCMTimeZero
-//          toleranceAfter:kCMTimeZero
-//       completionHandler:^(BOOL finished){
-//         if (wasPlaying){
-//             _player.rate = _playerRate;
-//         }
-//     }];
-// }
 
 - (void)seekTo:(int)location {
-    // Store current playback rate
-    float currentRate = _player.rate;
-    _playerRate = currentRate > 0 ? currentRate : _playerRate;
-    
-    // Check if player is currently playing
-    BOOL wasPlaying = _isPlaying;
-    
-    // Create seek time
-    CMTime seekTime = CMTimeMake(location, 1000);
-    
-    // Use reasonable tolerance values instead of exact seeking
-    CMTime toleranceBefore = CMTimeMake(250, 1000); // 250ms before
-    CMTime toleranceAfter = CMTimeMake(250, 1000);  // 250ms after
-    
-    // For high-speed playback (like 2x), use larger tolerance
-    if (_playerRate > 1.5) {
-        toleranceBefore = CMTimeMake(500, 1000); // 500ms before
-        toleranceAfter = CMTimeMake(500, 1000);  // 500ms after
-    }
-    
-    [_player seekToTime:seekTime
-        toleranceBefore:toleranceBefore
-         toleranceAfter:toleranceAfter
-      completionHandler:^(BOOL finished) {
-          if (finished && wasPlaying) {
-              // Resume playback with a very slight delay
-              dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                  _player.rate = _playerRate;
-              });
-          }
-          NSLog(@"Player rate after seek: %f", _player.rate);
-    }];
-    NSLog(@"Player rate11: %f", _playerRate);
+
+    [_player seekToTime:CMTimeMake(location, 1000)
+        toleranceBefore:kCMTimeZero
+         toleranceAfter:kCMTimeZero
+       completionHandler:^(BOOL finished) {
+           if (finished) {
+                // [_player setRate:_playerRate];
+               NSLog(@"Player rate finished: %f", _player.rate);
+           }
+       }];
+
 }
+
+
 
 - (void)setIsLooping:(bool)isLooping {
     _isLooping = isLooping;
@@ -580,6 +548,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (void)setSpeed:(double)speed result:(FlutterResult)result {
+
     if (speed == 1.0 || speed == 0.0) {
         _playerRate = 1;
         result(nil);
@@ -589,6 +558,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
                                    details:nil]);
     } else if ((speed > 1.0 && _player.currentItem.canPlayFastForward) ||
                (speed < 1.0 && _player.currentItem.canPlaySlowForward)) {
+ 
         _playerRate = speed;
         result(nil);
     } else {
@@ -599,12 +569,33 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
         }
     }
 
-    if (_isPlaying){
-        if (@available(iOS 16, *)) {
-            _player.defaultRate = speed;
-        }
-        _player.rate = speed;
-    }
+    // Only apply speed to player when initialized
+if (speed >0.0 && speed <=2.0) {
+   
+    
+    // if (_isPlaying) {
+    //     _player.rate = speed;
+        
+    // }
+    // else{
+
+    
+    // if (@available(iOS 16, *)) {
+    //     _player.defaultRate = speed;
+  
+    // } else {
+        
+    //     // For iOS versions before 16
+    //     // [_player setRate:0.0]; // First pause the player
+    //     _player.rate = speed; // Then set the new rate
+    // }
+    // }
+    _player.rate = speed;
+    _playerRate = speed;
+}
+   
+NSLog(@"Player Set speed: %f", _playerRate);
+ 
 }
 
 
@@ -788,6 +779,7 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 - (void)dispose {
+    NSLog(@"State dispose : %f", _isPlaying);
     [self pause];
     [self disposeSansEventChannel];
     [_eventChannel setStreamHandler:nil];
