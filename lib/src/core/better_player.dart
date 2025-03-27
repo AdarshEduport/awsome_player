@@ -63,7 +63,7 @@ class _BetterPlayerState extends State<BetterPlayer>
   @override
   void initState() {
     super.initState();
-   if(widget.controller.betterPlayerConfiguration.allowedScreenSleep){
+   if(!widget.controller.betterPlayerConfiguration.allowedScreenSleep){
     WakelockPlus.enable();
    }
     WidgetsBinding.instance.addObserver(this);
