@@ -44,7 +44,7 @@ class BetterPlayerConfiguration {
   /// Defines if the player will start in fullscreen when play is pressed
   final bool fullScreenByDefault;
 
-  /// Defines if the player will sleep in fullscreen or not
+  /// Defines if the player will sleep  or not
   final bool allowedScreenSleep;
 
   /// Defines aspect ratio which will be used in fullscreen

@@ -63,6 +63,9 @@ class _BetterPlayerState extends State<BetterPlayer>
   @override
   void initState() {
     super.initState();
+   if(widget.controller.betterPlayerConfiguration.allowedScreenSleep){
+    WakelockPlus.enable();
+   }
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -101,8 +104,9 @@ class _BetterPlayerState extends State<BetterPlayer>
     ///If somehow BetterPlayer widget has been disposed from widget tree and
     ///full screen is on, then full screen route must be pop and return to normal
     ///state.
+    WakelockPlus.disable();
     if (_isFullScreen) {
-      WakelockPlus.disable();
+      
       _navigatorState.maybePop();
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
           overlays: _betterPlayerConfiguration.systemOverlaysAfterFullScreen);
@@ -243,9 +247,7 @@ class _BetterPlayerState extends State<BetterPlayer>
       );
     }
 
-    if (!_betterPlayerConfiguration.allowedScreenSleep) {
-      WakelockPlus.enable();
-    }
+   
 
     await Navigator.of(context, rootNavigator: true).push(route);
     _isFullScreen = false;
