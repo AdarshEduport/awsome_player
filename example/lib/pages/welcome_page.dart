@@ -9,6 +9,7 @@ import 'package:awesome_video_player_example/pages/controller_controls_page.dart
 import 'package:awesome_video_player_example/pages/controls_always_visible_page.dart';
 import 'package:awesome_video_player_example/pages/controls_configuration_page.dart';
 import 'package:awesome_video_player_example/pages/custom_controls/change_player_theme_page.dart';
+import 'package:awesome_video_player_example/pages/custom_controls/custom_theme.dart';
 import 'package:awesome_video_player_example/pages/dash_page.dart';
 import 'package:awesome_video_player_example/pages/drm_page.dart';
 import 'package:awesome_video_player_example/pages/event_listener_page.dart';
@@ -50,6 +51,7 @@ class _WelcomePageState extends State<WelcomePage> {
 
   @override
   Widget build(BuildContext context) {
+    return HlsTest();
     return Scaffold(
       appBar: AppBar(
         title: Text("Better Player Example"),

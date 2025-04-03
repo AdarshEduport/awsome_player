@@ -10,6 +10,8 @@ class Constants {
   static const String fileExampleSubtitlesUrl = "example_subtitles.srt";
   static const String hlsTestStreamUrl =
       "https://mtoczko.github.io/hls-test-streams/test-group/playlist.m3u8";
+       static const String hlsTestStreamUrlNew =
+      'https://d357lqen3ahf81.cloudfront.net/transcoded/7ZgAq4yZ8Cz/video.m3u8';
   static const String hlsPlaylistUrl =
       "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
   static const Map<String, String> exampleResolutionsUrls = {
