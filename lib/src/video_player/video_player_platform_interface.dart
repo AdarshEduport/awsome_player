@@ -379,6 +379,7 @@ class VideoEvent {
     this.size,
     this.buffered,
     this.position,
+    this.analytics
   });
 
   /// The type of the event.
@@ -407,11 +408,15 @@ class VideoEvent {
   ///Seek position
   final Duration? position;
 
+
+  final Map<String,dynamic> ? analytics;
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         other is VideoEvent &&
             runtimeType == other.runtimeType &&
+            mapEquals(analytics, other.analytics)&&
             key == other.key &&
             eventType == other.eventType &&
             duration == other.duration &&
@@ -422,6 +427,7 @@ class VideoEvent {
   @override
   int get hashCode =>
       eventType.hashCode ^
+      analytics.hashCode^
       duration.hashCode ^
       size.hashCode ^
       buffered.hashCode;
@@ -464,6 +470,10 @@ enum VideoEventType {
 
   /// An unknown event has been received.
   unknown,
+
+  // analytics event
+
+  analytics
 }
 
 /// Describes a discrete segment of time within a video using a [start] and

@@ -408,6 +408,11 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
             eventType: VideoEventType.pipStop,
             key: key,
           );
+        case 'analytics':
+          return VideoEvent(
+            eventType: VideoEventType.analytics,
+            key: key,
+          );
 
         default:
           return VideoEvent(

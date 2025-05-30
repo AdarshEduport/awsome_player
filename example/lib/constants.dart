@@ -11,7 +11,7 @@ class Constants {
   static const String hlsTestStreamUrl =
       "https://d357lqen3ahf81.cloudfront.net/transcoded/7ZgAq4yZ8Cz/video.m3u8";
   static const String hlsPlaylistUrl =
-      "https://d357lqen3ahf81.cloudfront.net/transcoded/7ZgAq4yZ8Cz/video.m3u8";
+      "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
   static const Map<String, String> exampleResolutionsUrls = {
     "LOW":
         "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4",

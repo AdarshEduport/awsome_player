@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:awesome_video_player/awesome_video_player.dart';
 import 'package:awesome_video_player_example/constants.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +21,19 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
     );
     BetterPlayerDataSource dataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
-      Constants.hlsTestStreamUrl,
+      'https://cdn.radiantmediatechs.com/rmp/media/samples-for-rmp-site/04052024-lac-de-bimont/hls/playlist.m3u8',
+      // Constants.hlsTestStreamUrl,
       useAsmsSubtitles: true,
       videoFormat: BetterPlayerVideoFormat.hls
     );
     _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     _betterPlayerController.setupDataSource(dataSource);
+    _betterPlayerController.addEventsListener((e){
+      if(e.betterPlayerEventType==BetterPlayerEventType.analytics){
+ log('EVENT----${e.betterPlayerEventType}==${e.parameters}');
+      }
+     
+    });
     super.initState();
   }
 

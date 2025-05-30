@@ -33,6 +33,7 @@ class VideoPlayerValue {
     this.speed = 1.0,
     this.errorDescription,
     this.isPip = false,
+    this.analytics
   });
 
   /// Returns an instance with a `null` [Duration].
@@ -42,6 +43,8 @@ class VideoPlayerValue {
   /// [errorDescription].
   VideoPlayerValue.erroneous(String errorDescription)
       : this(duration: null, errorDescription: errorDescription);
+  /// analytics for the video
+  final Map<String, dynamic> ? analytics;
 
   /// The total duration of the video.
   ///
@@ -122,9 +125,11 @@ class VideoPlayerValue {
     String? errorDescription,
     double? speed,
     bool? isPip,
+    Map<String, dynamic>?  analytics
   }) {
     return VideoPlayerValue(
       duration: duration ?? this.duration,
+      analytics: analytics??this.analytics,
       size: size ?? this.size,
       position: position ?? this.position,
       absolutePosition: absolutePosition ?? this.absolutePosition,
@@ -152,6 +157,7 @@ class VideoPlayerValue {
         'isLooping: $isLooping, '
         'isBuffering: $isBuffering, '
         'volume: $volume, '
+        'analytics:$analytics'
         'errorDescription: $errorDescription)';
   }
 }
@@ -252,6 +258,10 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
         case VideoEventType.pipStop:
           value = value.copyWith(isPip: false);
           break;
+        case VideoEventType.analytics:
+          value = value.copyWith(analytics: event.analytics);
+          break;
+        
         case VideoEventType.unknown:
           break;
       }

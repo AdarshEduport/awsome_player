@@ -21,6 +21,7 @@ class BetterPlayerController {
   static const String _speedParameter = "speed";
   static const String _dataSourceParameter = "dataSource";
   static const String _authorizationHeader = "Authorization";
+    static const String _analyticsParameter = "Analitics";
 
   ///General configuration used in controller instance.
   final BetterPlayerConfiguration betterPlayerConfiguration;
@@ -1160,6 +1161,11 @@ class BetterPlayerController {
       case VideoEventType.bufferingEnd:
         _postEvent(BetterPlayerEvent(BetterPlayerEventType.bufferingEnd));
         break;
+      case VideoEventType.analytics:
+        _postEvent(BetterPlayerEvent(BetterPlayerEventType.analytics,
+        parameters: <String, dynamic>{
+              _analyticsParameter: event.analytics,
+            } ));
       default:
 
         ///TODO: Handle when needed

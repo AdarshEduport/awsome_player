@@ -19,6 +19,7 @@ class _DashPageState extends State<DashPage> {
     );
     BetterPlayerDataSource dataSource = BetterPlayerDataSource(
         BetterPlayerDataSourceType.network, Constants.dashStreamUrl,
+        videoFormat:  BetterPlayerVideoFormat.dash,
         useAsmsSubtitles: true, useAsmsTracks: true);
     _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     _betterPlayerController.setupDataSource(dataSource);

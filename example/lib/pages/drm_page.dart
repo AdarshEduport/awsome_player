@@ -16,6 +16,7 @@ class _DrmPageState extends State<DrmPage> {
   void initState() {
     BetterPlayerConfiguration betterPlayerConfiguration =
         BetterPlayerConfiguration(
+          
       aspectRatio: 16 / 9,
       fit: BoxFit.contain,
     );
@@ -33,6 +34,7 @@ class _DrmPageState extends State<DrmPage> {
     _widevineController = BetterPlayerController(betterPlayerConfiguration);
     BetterPlayerDataSource _widevineDataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
+       videoFormat: BetterPlayerVideoFormat.hls,
       Constants.widevineVideoUrl,
       drmConfiguration: BetterPlayerDrmConfiguration(
           drmType: BetterPlayerDrmType.widevine,

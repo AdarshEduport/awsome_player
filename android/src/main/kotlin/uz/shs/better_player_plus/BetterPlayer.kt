@@ -142,6 +142,10 @@ internal class BetterPlayer(
         cacheKey: String?,
         clearKey: String?
     ) {
+
+        if(exoPlayer==null){
+            eventSink.error("VideoError", "CONFIG_ERROR", "NO INSTANCE")
+        }
         this.key = key
         isInitialized = false
         val uri = Uri.parse(dataSource)
@@ -505,7 +509,9 @@ internal class BetterPlayer(
                     }
 
                     Player.STATE_IDLE -> {
-                        //no-op
+                        val event: MutableMap<String, Any?> = HashMap()
+                        event["event"] = "idle"
+                        eventSink.success(event)
                     }
                 }
             }
@@ -516,11 +522,13 @@ internal class BetterPlayer(
         })
 
         exoPlayer?.addAnalyticsListener(object : AnalyticsListener {
+            
             override fun onVideoCodecError(
                 eventTime: AnalyticsListener.EventTime,
                 videoCodecError: Exception
             ) {
                 Log.d("ExoPlayer Decoder Error", "Decoder Format: ${videoCodecError}, x${eventTime}")
+
                 super.onVideoCodecError(eventTime, videoCodecError)
             }
 
@@ -537,6 +545,10 @@ internal class BetterPlayer(
                 initializedTimestampMs: Long,
                 initializationDurationMs: Long
             ) {
+                val event: MutableMap<String, Any> = HashMap()
+                event["event"] = "analytics"
+//                event["values"] = mapOf("decoderName" to decoderName)
+                eventSink.success(event)
                 Log.d("ExoPlayer Decoder -audio", "initDecoder name: ${decoderName}, x${eventTime}")
                 super.onAudioDecoderInitialized(
                     eventTime,
@@ -552,6 +564,12 @@ internal class BetterPlayer(
                 initializedTimestampMs: Long,
                 initializationDurationMs: Long
             ) {
+                val event: MutableMap<String, Any> = HashMap()
+                event["event"] = "analytics"
+//                event["values"] = mapOf("decoderName" to decoderName)
+                eventSink.success(event)
+
+
 
                 Log.i("ExoPlayer Decoder", "Decoder init name: ${decoderName}, x${eventTime}")
                 super.onVideoDecoderInitialized(
