@@ -1,0 +1,2 @@
+/Users/adarshps/Desktop/development/awsome_player/example/android/app/.cxx/Debug/0372rw4f/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/adarshps/Desktop/development/awsome_player/example/android/app/.cxx/Debug/0372rw4f/armeabi-v7a/CMakeFiles/rebuild_cache.dir

@@ -51,6 +51,7 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.LoadControl
+import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.dash.DashMediaSource
 import androidx.media3.exoplayer.dash.DefaultDashChunkSource
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager
@@ -68,6 +69,8 @@ import androidx.media3.exoplayer.source.ClippingMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
 import java.io.File
 import java.lang.Exception
 import java.lang.IllegalStateException
@@ -85,6 +88,7 @@ internal class BetterPlayer(
     private val exoPlayer: ExoPlayer?
     private val eventSink = QueuingEventSink()
     private val trackSelector: DefaultTrackSelector = DefaultTrackSelector(context)
+    private  val renderersFactory :DefaultRenderersFactory = DefaultRenderersFactory(context)
     private val loadControl: LoadControl
     private var isInitialized = false
     private var surface: Surface? = null
@@ -103,6 +107,7 @@ internal class BetterPlayer(
     private var lastSendBufferedPosition = 0L
 
     init {
+        renderersFactory.setEnableDecoderFallback(true)
         val loadBuilder = DefaultLoadControl.Builder()
         loadBuilder.setBufferDurationsMs(
             this.customDefaultLoadControl.minBufferMs,
@@ -113,6 +118,7 @@ internal class BetterPlayer(
         loadControl = loadBuilder.build()
         exoPlayer = ExoPlayer.Builder(context)
             .setTrackSelector(trackSelector)
+            .setRenderersFactory(renderersFactory)
             .setLoadControl(loadControl)
             .build()
         workManager = WorkManager.getInstance(context)
@@ -505,9 +511,60 @@ internal class BetterPlayer(
             }
 
             override fun onPlayerError(error: PlaybackException) {
-                eventSink.error("VideoError", "Video player had error $error", "")
+                eventSink.error("VideoError", "${error.errorCodeName}", "")
             }
         })
+
+        exoPlayer?.addAnalyticsListener(object : AnalyticsListener {
+            override fun onVideoCodecError(
+                eventTime: AnalyticsListener.EventTime,
+                videoCodecError: Exception
+            ) {
+                Log.d("ExoPlayer Decoder Error", "Decoder Format: ${videoCodecError}, x${eventTime}")
+                super.onVideoCodecError(eventTime, videoCodecError)
+            }
+
+            override fun onAudioCodecError(
+                eventTime: AnalyticsListener.EventTime,
+                audioCodecError: Exception
+            ) {
+                Log.d("ExoPlayer Decoder audio Error", "errorDecoder Format: ${audioCodecError}, x${eventTime}")
+                super.onAudioCodecError(eventTime, audioCodecError)
+            }
+            override fun onAudioDecoderInitialized(
+                eventTime: AnalyticsListener.EventTime,
+                decoderName: String,
+                initializedTimestampMs: Long,
+                initializationDurationMs: Long
+            ) {
+                Log.d("ExoPlayer Decoder -audio", "initDecoder name: ${decoderName}, x${eventTime}")
+                super.onAudioDecoderInitialized(
+                    eventTime,
+                    decoderName,
+                    initializedTimestampMs,
+                    initializationDurationMs
+                )
+            }
+
+            override fun onVideoDecoderInitialized(
+                eventTime: AnalyticsListener.EventTime,
+                decoderName: String,
+                initializedTimestampMs: Long,
+                initializationDurationMs: Long
+            ) {
+
+                Log.i("ExoPlayer Decoder", "Decoder init name: ${decoderName}, x${eventTime}")
+                super.onVideoDecoderInitialized(
+                    eventTime,
+                    decoderName,
+                    initializedTimestampMs,
+                    initializationDurationMs
+                )
+            }
+
+
+        })
+        
         val reply: MutableMap<String, Any> = HashMap()
         reply["textureId"] = textureEntry.id()
         result.success(reply)
@@ -559,6 +616,11 @@ internal class BetterPlayer(
         val playbackParameters = PlaybackParameters(bracketedValue)
         exoPlayer?.playbackParameters = playbackParameters
     }
+
+
+
+
+
 
     fun setTrackParameters(width: Int, height: Int, bitrate: Int) {
         val parametersBuilder = trackSelector.buildUponParameters()
@@ -756,7 +818,7 @@ internal class BetterPlayer(
         }
         textureEntry.release()
         eventChannel.setStreamHandler(null)
-        surface?.release()
+        //surface?.release()
         exoPlayer?.release()
     }
 

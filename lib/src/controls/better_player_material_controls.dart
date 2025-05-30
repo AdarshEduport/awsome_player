@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:awesome_video_player/src/configuration/better_player_controls_configuration.dart';
 import 'package:awesome_video_player/src/controls/better_player_clickable_widget.dart';
 import 'package:awesome_video_player/src/controls/better_player_controls_state.dart';
@@ -152,6 +153,9 @@ class _BetterPlayerMaterialControlsState
           _betterPlayerController!
               .videoPlayerController!.value.errorDescription);
     } else {
+      final betterPlayerError = _betterPlayerController!
+              .videoPlayerController!.value.errorDescription;
+      final errorDesc= Platform.isAndroid && betterPlayerError!=null?   betterPlayerError:_betterPlayerController!.translations.generalDefaultError;
       final textStyle = TextStyle(color: _controlsConfiguration.textColor);
       return Center(
         child: Column(
@@ -163,7 +167,8 @@ class _BetterPlayerMaterialControlsState
               size: 42,
             ),
             Text(
-              _betterPlayerController!.translations.generalDefaultError,
+              errorDesc
+            ,
               style: textStyle,
             ),
             if (_controlsConfiguration.enableRetry)
