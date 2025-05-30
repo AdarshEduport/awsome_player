@@ -67,4 +67,5 @@ flutter {
 
 dependencies {
     implementation "androidx.multidex:multidex:2.0.1"
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 }

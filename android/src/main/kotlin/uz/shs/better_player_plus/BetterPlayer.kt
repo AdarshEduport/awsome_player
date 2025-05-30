@@ -509,9 +509,7 @@ internal class BetterPlayer(
                     }
 
                     Player.STATE_IDLE -> {
-                        val event: MutableMap<String, Any?> = HashMap()
-                        event["event"] = "idle"
-                        eventSink.success(event)
+                        Log.d("ExoPlayer STATE_IDLE ", "d")
                     }
                 }
             }
@@ -836,7 +834,7 @@ internal class BetterPlayer(
         }
         textureEntry.release()
         eventChannel.setStreamHandler(null)
-        //surface?.release()
+        surface?.release()
         exoPlayer?.release()
     }
 
