@@ -71,6 +71,7 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import java.io.File
 import java.lang.Exception
 import java.lang.IllegalStateException
@@ -106,7 +107,46 @@ internal class BetterPlayer(
         customDefaultLoadControl ?: CustomDefaultLoadControl()
     private var lastSendBufferedPosition = 0L
 
+    val softwareMediaCodecSelector =
+        MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
+            Log.d("ExoPlayer SW", "Looking for decoders for: $mimeType")
+
+            try {
+                val allDecoders = MediaCodecUtil.getDecoderInfos(
+                    mimeType,
+                    requiresSecureDecoder,
+                    requiresTunnelingDecoder
+                )
+
+                // Filter for software decoders
+                val (softwareList, hardwareList) = allDecoders.partition { decoderInfo ->
+                    val name = decoderInfo.name.lowercase()
+                    val isSoftware = name.contains("omx.google") ||
+                            name.contains("c2.android") ||
+                            name.contains("sw") ||
+                            !name.contains("qcom") && !name.contains("mtk") && !name.contains("exynos")
+
+                    if (isSoftware) {
+                        Log.d("ExoPlayer SW", "Software decoder found: ${decoderInfo.name}")
+                    }
+                    isSoftware
+                }
+
+
+                softwareList.ifEmpty {
+                    allDecoders
+                }
+                Log.d("ExoPlayer SW-->", "Available decoder:SW ${softwareList.toString()} <-------and-----> HW ${hardwareList.toString()} ")
+                softwareList
+
+            } catch (e: Exception) {
+                Log.e("ExoPlayer SW", "Error getting decoders for $mimeType", e)
+                emptyList()
+            }
+        }
+
     init {
+        renderersFactory.setMediaCodecSelector(softwareMediaCodecSelector)
         renderersFactory.setEnableDecoderFallback(true)
         val loadBuilder = DefaultLoadControl.Builder()
         loadBuilder.setBufferDurationsMs(
