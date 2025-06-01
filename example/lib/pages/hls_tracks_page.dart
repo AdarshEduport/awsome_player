@@ -14,6 +14,7 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
 
   @override
   void initState() {
+    final hi ='https://repo.jellyfin.org/archive/jellyfish/media/jellyfish-400-mbps-4k-uhd-hevc-10bit.mkv';
     BetterPlayerConfiguration betterPlayerConfiguration =
         BetterPlayerConfiguration(
       aspectRatio: 16 / 9,
@@ -24,10 +25,10 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
       bufferingConfiguration: BetterPlayerBufferingConfiguration(
         useSWOnly: true
       ),
-      'https://cdn.radiantmediatechs.com/rmp/media/samples-for-rmp-site/04052024-lac-de-bimont/hls/playlist.m3u8',
+      hi,
       // Constants.hlsTestStreamUrl,
       useAsmsSubtitles: true,
-      videoFormat: BetterPlayerVideoFormat.hls
+      // videoFormat: BetterPlayerVideoFormat.hls
     );
     _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     _betterPlayerController.setupDataSource(dataSource);

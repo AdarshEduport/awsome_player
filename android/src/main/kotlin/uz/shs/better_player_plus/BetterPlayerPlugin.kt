@@ -78,11 +78,17 @@ class BetterPlayerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         activity = binding.activity
     }
 
-    override fun onDetachedFromActivityForConfigChanges() {}
+    override fun onDetachedFromActivityForConfigChanges() {
+        Log.d("ExoPlayer ------> ", "onDetachedFromActivityForConfigChanges")
+    }
 
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {}
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        Log.d("ExoPlayer ------> ", "onReattachedToActivityForConfigChanges")
+    }
 
-    override fun onDetachedFromActivity() {}
+    override fun onDetachedFromActivity() {
+        Log.d("ExoPlayer ------> ", "onDetachedFromActivity")
+    }
 
     private fun disposeAllPlayers() {
         for (i in 0 until videoPlayers.size()) {
@@ -100,6 +106,13 @@ class BetterPlayerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         when (call.method) {
             INIT_METHOD -> disposeAllPlayers()
             CREATE_METHOD -> {
+                val cleanInit = call.argument<Boolean>(CLEAN_INIT) ?: false
+                if(cleanInit){
+                    Log.d("ExoPlayer ------> ", "clean -init")
+                    disposeAllPlayers()
+                    releaseCache()
+                }
+
                 val handle = flutterState!!.textureRegistry!!.createSurfaceTexture()
                 val eventChannel = EventChannel(
                     flutterState?.binaryMessenger, EVENTS_CHANNEL + handle.id()
@@ -577,6 +590,7 @@ class BetterPlayerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         private const val PRE_CACHE_METHOD = "preCache"
         private const val STOP_PRE_CACHE_METHOD = "stopPreCache"
         private const val USE_SW_ONLY = "useSWOnly"
+        private  const val CLEAN_INIT ="cleanInit"
 
     }
 }

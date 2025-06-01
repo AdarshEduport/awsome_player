@@ -148,6 +148,8 @@ internal class BetterPlayer(
 
     init {
         Log.d("ExoPlayer ------> ", "$useSWOnly")
+        val event: MutableMap<String, Any> = HashMap()
+
         if(useSWOnly==true) {
         renderersFactory.setMediaCodecSelector(softwareMediaCodecSelector)
         }
@@ -542,6 +544,7 @@ internal class BetterPlayer(
                         }
                         val event: MutableMap<String, Any> = HashMap()
                         event["event"] = "bufferingEnd"
+
                         eventSink.success(event)
                     }
 
@@ -569,6 +572,10 @@ internal class BetterPlayer(
                 eventTime: AnalyticsListener.EventTime,
                 videoCodecError: Exception
             ) {
+                val event: MutableMap<String, Any> = HashMap()
+                event["event"] = "analytics"
+                event["values"] = mapOf("Video Decoder Error" to videoCodecError.message.toString())
+                eventSink.success(event)
                 Log.d("ExoPlayer Decoder Error", "Decoder Format: ${videoCodecError}, x${eventTime}")
 
                 super.onVideoCodecError(eventTime, videoCodecError)
@@ -578,6 +585,11 @@ internal class BetterPlayer(
                 eventTime: AnalyticsListener.EventTime,
                 audioCodecError: Exception
             ) {
+
+                val event: MutableMap<String, Any> = HashMap()
+                event["event"] = "analytics"
+                event["values"] = mapOf("Audio Decoder Error" to audioCodecError.message.toString())
+                eventSink.success(event)
                 Log.d("ExoPlayer Decoder audio Error", "errorDecoder Format: ${audioCodecError}, x${eventTime}")
                 super.onAudioCodecError(eventTime, audioCodecError)
             }
@@ -589,7 +601,7 @@ internal class BetterPlayer(
             ) {
                 val event: MutableMap<String, Any> = HashMap()
                 event["event"] = "analytics"
-//                event["values"] = mapOf("decoderName" to decoderName)
+                event["values"] = mapOf("AudioDecoderName" to decoderName)
                 eventSink.success(event)
                 Log.d("ExoPlayer Decoder -audio", "initDecoder name: ${decoderName}, x${eventTime}")
                 super.onAudioDecoderInitialized(
@@ -608,7 +620,7 @@ internal class BetterPlayer(
             ) {
                 val event: MutableMap<String, Any> = HashMap()
                 event["event"] = "analytics"
-//                event["values"] = mapOf("decoderName" to decoderName)
+                event["values"] = mapOf("VideoDecoderName" to decoderName)
                 eventSink.success(event)
 
 

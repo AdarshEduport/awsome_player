@@ -37,6 +37,7 @@ class MethodChannelVideoPlayer extends VideoPlayerPlatform {
       final responseLinkedHashMap = await _channel.invokeMethod<Map?>(
         'create',
         <String, dynamic>{
+          'cleanInit':bufferingConfiguration.cleanInit,
           'useSWOnly':bufferingConfiguration.useSWOnly,
           'minBufferMs': bufferingConfiguration.minBufferMs,
           'maxBufferMs': bufferingConfiguration.maxBufferMs,
