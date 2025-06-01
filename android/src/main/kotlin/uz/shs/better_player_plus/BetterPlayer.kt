@@ -84,7 +84,7 @@ internal class BetterPlayer(
     private val eventChannel: EventChannel,
     private val textureEntry: SurfaceTextureEntry,
     customDefaultLoadControl: CustomDefaultLoadControl?,
-    useSWOnly :Boolean ?,
+    useSWOnly :Boolean?,
     result: MethodChannel.Result
 ) {
     private val exoPlayer: ExoPlayer?
