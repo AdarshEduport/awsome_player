@@ -84,6 +84,7 @@ internal class BetterPlayer(
     private val eventChannel: EventChannel,
     private val textureEntry: SurfaceTextureEntry,
     customDefaultLoadControl: CustomDefaultLoadControl?,
+    useSWOnly :Boolean ?,
     result: MethodChannel.Result
 ) {
     private val exoPlayer: ExoPlayer?
@@ -146,7 +147,9 @@ internal class BetterPlayer(
         }
 
     init {
-        renderersFactory.setMediaCodecSelector(softwareMediaCodecSelector)
+        if(useSWOnly==true) {
+            renderersFactory.setMediaCodecSelector(softwareMediaCodecSelector)
+        }
         renderersFactory.setEnableDecoderFallback(true)
         val loadBuilder = DefaultLoadControl.Builder()
         loadBuilder.setBufferDurationsMs(

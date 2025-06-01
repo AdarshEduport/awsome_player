@@ -7,6 +7,7 @@ class BetterPlayerBufferingConfiguration {
   static const defaultMaxBufferMs = 6553600;
   static const defaultBufferForPlaybackMs = 3000;
   static const defaultBufferForPlaybackAfterRebufferMs = 6000;
+  static const bool defaultUseOnlySW=false;
 
   /// The default minimum duration of media that the player will attempt to
   /// ensure is buffered at all times, in milliseconds.
@@ -25,7 +26,12 @@ class BetterPlayerBufferingConfiguration {
   /// buffer depletion rather than a user action.
   final int bufferForPlaybackAfterRebufferMs;
 
+
+  // flag for setting sw decoder 
+  final bool useOnlySW;
+
   const BetterPlayerBufferingConfiguration({
+    this.useOnlySW = defaultUseOnlySW,
     this.minBufferMs = defaultMinBufferMs,
     this.maxBufferMs = defaultMaxBufferMs,
     this.bufferForPlaybackMs = defaultBufferForPlaybackMs,

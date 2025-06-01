@@ -117,6 +117,7 @@ class BetterPlayerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                     )
                 }
                 val player = BetterPlayer(
+                    useSWOnly = call.argument(USE_SW_ONLY)
                     flutterState?.applicationContext!!, eventChannel, handle,
                     customDefaultLoadControl, result
                 )
@@ -573,5 +574,7 @@ class BetterPlayerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         private const val DISPOSE_METHOD = "dispose"
         private const val PRE_CACHE_METHOD = "preCache"
         private const val STOP_PRE_CACHE_METHOD = "stopPreCache"
+        private const val USE_SW_ONLY = "useSWOnly"
+
     }
 }
