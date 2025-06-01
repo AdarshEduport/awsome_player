@@ -22,7 +22,7 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
     BetterPlayerDataSource dataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
       bufferingConfiguration: BetterPlayerBufferingConfiguration(
-        useOnlySW: true
+        useSWOnly: true
       ),
       'https://cdn.radiantmediatechs.com/rmp/media/samples-for-rmp-site/04052024-lac-de-bimont/hls/playlist.m3u8',
       // Constants.hlsTestStreamUrl,

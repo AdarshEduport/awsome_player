@@ -28,10 +28,10 @@ class BetterPlayerBufferingConfiguration {
 
 
   // flag for setting sw decoder 
-  final bool useOnlySW;
+  final bool useSWOnly;
 
   const BetterPlayerBufferingConfiguration({
-    this.useOnlySW = defaultUseOnlySW,
+    this.useSWOnly = defaultUseOnlySW,
     this.minBufferMs = defaultMinBufferMs,
     this.maxBufferMs = defaultMaxBufferMs,
     this.bufferForPlaybackMs = defaultBufferForPlaybackMs,

@@ -70,8 +70,8 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.DefaultRenderersFactory
-import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
+import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
 import java.io.File
 import java.lang.Exception
 import java.lang.IllegalStateException
@@ -147,8 +147,9 @@ internal class BetterPlayer(
         }
 
     init {
+        Log.d("ExoPlayer ------> ", "$useSWOnly")
         if(useSWOnly==true) {
-            renderersFactory.setMediaCodecSelector(softwareMediaCodecSelector)
+        renderersFactory.setMediaCodecSelector(softwareMediaCodecSelector)
         }
         renderersFactory.setEnableDecoderFallback(true)
         val loadBuilder = DefaultLoadControl.Builder()
