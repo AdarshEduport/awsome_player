@@ -23,12 +23,13 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
     BetterPlayerDataSource dataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
       bufferingConfiguration: BetterPlayerBufferingConfiguration(
+        cleanInit:true ,
         useSWOnly: true
       ),
-      hi,
-      // Constants.hlsTestStreamUrl,
+      
+      Constants.hlsTestStreamUrl,
       useAsmsSubtitles: true,
-      // videoFormat: BetterPlayerVideoFormat.hls
+      videoFormat: BetterPlayerVideoFormat.hls
     );
     _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     _betterPlayerController.setupDataSource(dataSource);
