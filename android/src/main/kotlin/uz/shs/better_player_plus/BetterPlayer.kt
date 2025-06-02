@@ -583,8 +583,9 @@ internal class BetterPlayer(
             }
 
             override fun onPlayerError(error: PlaybackException) {
-                Log.d("ExoPlayer ------>5 ", "error")
-                eventSink.error("VideoError", "${error.errorCodeName}", "")
+                eventSink.error("VideoError", error.errorCodeName, "")
+                Log.d("ExoPlayer ------>5 ", "${error.errorCodeName} -- ${error.message}-- ${error.cause} --${error.stackTrace}")
+
             }
         })
 
@@ -599,7 +600,7 @@ internal class BetterPlayer(
                 event["values"] = mapOf("Video Decoder Error" to videoCodecError.message.toString())
                 eventSink.success(event)
                 Log.d("ExoPlayer Decoder Error", "Decoder Format: ${videoCodecError}, x${eventTime}")
-                Log.d("ExoPlayer ------>5 ", "error vDeco")
+                Log.d("ExoPlayer ------>5b ", "error vDeco")
                 super.onVideoCodecError(eventTime, videoCodecError)
             }
 
@@ -678,7 +679,7 @@ internal class BetterPlayer(
             event["values"] = listOf(range)
             eventSink.success(event)
             lastSendBufferedPosition = bufferedPosition
-            Log.d("ExoPlayer ------>9 ", "sendBufferingUpdate")
+            Log.d("ExoPlayer ------>9 ", "sendBufferingUpdate$lastSendBufferedPosition")
         }
     }
 
