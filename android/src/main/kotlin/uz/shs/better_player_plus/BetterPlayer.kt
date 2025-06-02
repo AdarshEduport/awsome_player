@@ -147,7 +147,7 @@ internal class BetterPlayer(
         }
 
     init {
-        Log.d("ExoPlayer ------> ", "$useSWOnly")
+        Log.d("ExoPlayer ------>1 ", "$useSWOnly")
         val event: MutableMap<String, Any> = HashMap()
 
         if(useSWOnly==true) {
@@ -169,6 +169,7 @@ internal class BetterPlayer(
             .build()
         workManager = WorkManager.getInstance(context)
         workerObserverMap = HashMap()
+        Log.d("ExoPlayer ------>2", "")
         setupVideoPlayer(eventChannel, textureEntry, result)
     }
 
@@ -188,8 +189,10 @@ internal class BetterPlayer(
         cacheKey: String?,
         clearKey: String?
     ) {
-
+        Log.d("ExoPlayer ------>26 ", "setDataSource ")
         if(exoPlayer==null){
+
+            Log.d("ExoPlayer ------>27 ", "exoPlayer==null")
             eventSink.error("VideoError", "CONFIG_ERROR", "NO INSTANCE")
         }
         this.key = key
@@ -198,17 +201,21 @@ internal class BetterPlayer(
         var dataSourceFactory: DataSource.Factory?
         val userAgent = getUserAgent(headers)
         if (!licenseUrl.isNullOrEmpty()) {
+            Log.d("ExoPlayer ------>27 ", "setDataSource ")
             val httpMediaDrmCallback =
                 HttpMediaDrmCallback(licenseUrl, DefaultHttpDataSource.Factory())
             if (drmHeaders != null) {
+                Log.d("ExoPlayer ------>28 ", "setDataSource ")
                 for ((drmKey, drmValue) in drmHeaders) {
                     httpMediaDrmCallback.setKeyRequestProperty(drmKey, drmValue)
                 }
             }
             if (Util.SDK_INT < 18) {
+
                 Log.e(TAG, "Protected content not supported on API levels below 18")
                 drmSessionManager = null
             } else {
+                Log.d("ExoPlayer ------>29 ", "setDataSource ")
                 val drmSchemeUuid = Util.getDrmUuid("widevine")
                 if (drmSchemeUuid != null) {
                     drmSessionManager = DefaultDrmSessionManager.Builder()
@@ -229,6 +236,7 @@ internal class BetterPlayer(
                 }
             }
         } else if (!clearKey.isNullOrEmpty()) {
+            Log.d("ExoPlayer ------>30 ", "setDataSource ")
             drmSessionManager = if (Util.SDK_INT < 18) {
                 Log.e(TAG, "Protected content not supported on API levels below 18")
                 null
@@ -243,8 +251,10 @@ internal class BetterPlayer(
             drmSessionManager = null
         }
         if (isHTTP(uri)) {
+            Log.d("ExoPlayer ------>31 ", "setDataSource ")
             dataSourceFactory = getDataSourceFactory(userAgent, headers)
             if (useCache && maxCacheSize > 0 && maxCacheFileSize > 0) {
+                Log.d("ExoPlayer ------>32 ", "setDataSource ")
                 dataSourceFactory = CacheDataSourceFactory(
                     context,
                     maxCacheSize,
@@ -252,18 +262,23 @@ internal class BetterPlayer(
                     dataSourceFactory
                 )
             }
+            Log.d("ExoPlayer ------>33 ", "setDataSource ")
         } else {
+            Log.d("ExoPlayer ------>34 ", "setDataSource ")
             dataSourceFactory = DefaultDataSource.Factory(context)
         }
         val mediaSource = buildMediaSource(uri, dataSourceFactory, formatHint, cacheKey, context)
         if (overriddenDuration != 0L) {
             val clippingMediaSource = ClippingMediaSource(mediaSource, 0, overriddenDuration * 1000)
             exoPlayer?.setMediaSource(clippingMediaSource)
+            Log.d("ExoPlayer ------>35 ", "setDataSource exo ${exoPlayer!=null} ")
         } else {
+            Log.d("ExoPlayer ------>36 ", "setDataSource ")
             exoPlayer?.setMediaSource(mediaSource)
         }
         exoPlayer?.prepare()
         result.success(null)
+        Log.d("ExoPlayer ------>37 ", "setDataSource ")
     }
 
     fun setupPlayerNotification(
@@ -513,13 +528,16 @@ internal class BetterPlayer(
     private fun setupVideoPlayer(
         eventChannel: EventChannel, textureEntry: SurfaceTextureEntry, result: MethodChannel.Result
     ) {
+
         eventChannel.setStreamHandler(
             object : EventChannel.StreamHandler {
                 override fun onListen(o: Any?, sink: EventSink) {
+                    Log.d("ExoPlayer ------>3a", "")
                     eventSink.setDelegate(sink)
                 }
 
                 override fun onCancel(o: Any?) {
+                    Log.d("ExoPlayer ------>3b", "")
                     eventSink.setDelegate(null)
                 }
             },
@@ -527,12 +545,14 @@ internal class BetterPlayer(
         surface = Surface(textureEntry.surfaceTexture())
         exoPlayer?.setVideoSurface(surface)
         setAudioAttributes(exoPlayer, true)
+        Log.d("ExoPlayer ------>4", "${exoPlayer!=null}")
         exoPlayer?.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 when (playbackState) {
                     Player.STATE_BUFFERING -> {
                         sendBufferingUpdate(true)
                         val event: MutableMap<String, Any> = HashMap()
+                        Log.d("ExoPlayer STATE_BUFFE..", "d")
                         event["event"] = "bufferingStart"
                         eventSink.success(event)
                     }
@@ -544,7 +564,7 @@ internal class BetterPlayer(
                         }
                         val event: MutableMap<String, Any> = HashMap()
                         event["event"] = "bufferingEnd"
-
+                        Log.d("ExoPlayer STATE_READY ", "d")
                         eventSink.success(event)
                     }
 
@@ -552,6 +572,7 @@ internal class BetterPlayer(
                         val event: MutableMap<String, Any?> = HashMap()
                         event["event"] = "completed"
                         event["key"] = key
+                        Log.d("ExoPlayer Ended ", "d")
                         eventSink.success(event)
                     }
 
@@ -562,6 +583,7 @@ internal class BetterPlayer(
             }
 
             override fun onPlayerError(error: PlaybackException) {
+                Log.d("ExoPlayer ------>5 ", "error")
                 eventSink.error("VideoError", "${error.errorCodeName}", "")
             }
         })
@@ -577,7 +599,7 @@ internal class BetterPlayer(
                 event["values"] = mapOf("Video Decoder Error" to videoCodecError.message.toString())
                 eventSink.success(event)
                 Log.d("ExoPlayer Decoder Error", "Decoder Format: ${videoCodecError}, x${eventTime}")
-
+                Log.d("ExoPlayer ------>5 ", "error vDeco")
                 super.onVideoCodecError(eventTime, videoCodecError)
             }
 
@@ -591,6 +613,7 @@ internal class BetterPlayer(
                 event["values"] = mapOf("Audio Decoder Error" to audioCodecError.message.toString())
                 eventSink.success(event)
                 Log.d("ExoPlayer Decoder audio Error", "errorDecoder Format: ${audioCodecError}, x${eventTime}")
+                Log.d("ExoPlayer ------>6 ", "error aDeco")
                 super.onAudioCodecError(eventTime, audioCodecError)
             }
             override fun onAudioDecoderInitialized(
@@ -604,6 +627,7 @@ internal class BetterPlayer(
                 event["values"] = mapOf("AudioDecoderName" to decoderName)
                 eventSink.success(event)
                 Log.d("ExoPlayer Decoder -audio", "initDecoder name: ${decoderName}, x${eventTime}")
+                Log.d("ExoPlayer ------>7 ", "a-dec init")
                 super.onAudioDecoderInitialized(
                     eventTime,
                     decoderName,
@@ -626,6 +650,7 @@ internal class BetterPlayer(
 
 
                 Log.i("ExoPlayer Decoder", "Decoder init name: ${decoderName}, x${eventTime}")
+                Log.d("ExoPlayer ------>7 ", " vDeco init")
                 super.onVideoDecoderInitialized(
                     eventTime,
                     decoderName,
@@ -640,6 +665,7 @@ internal class BetterPlayer(
         val reply: MutableMap<String, Any> = HashMap()
         reply["textureId"] = textureEntry.id()
         result.success(reply)
+        Log.d("ExoPlayer ------>8 ", "setup success")
     }
 
     fun sendBufferingUpdate(isFromBufferingStart: Boolean) {
@@ -652,6 +678,7 @@ internal class BetterPlayer(
             event["values"] = listOf(range)
             eventSink.success(event)
             lastSendBufferedPosition = bufferedPosition
+            Log.d("ExoPlayer ------>9 ", "sendBufferingUpdate")
         }
     }
 
@@ -666,27 +693,36 @@ internal class BetterPlayer(
     }
 
     fun play() {
+
         exoPlayer?.playWhenReady = true
+        Log.d("ExoPlayer ------>10 ", "play")
     }
 
     fun pause() {
+
         exoPlayer?.playWhenReady = false
+        Log.d("ExoPlayer ------>11 ", "pause")
     }
 
     fun setLooping(value: Boolean) {
+
         exoPlayer?.repeatMode = if (value) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
+        Log.d("ExoPlayer ------>12 ", "setLooping")
     }
 
     fun setVolume(value: Double) {
+
         val bracketedValue = max(0.0, min(1.0, value))
             .toFloat()
         exoPlayer?.volume = bracketedValue
+        Log.d("ExoPlayer ------>13 ", "setVolume")
     }
 
     fun setSpeed(value: Double) {
         val bracketedValue = value.toFloat()
         val playbackParameters = PlaybackParameters(bracketedValue)
         exoPlayer?.playbackParameters = playbackParameters
+        Log.d("ExoPlayer ------>14 ", "setSpeed")
     }
 
 
@@ -707,9 +743,11 @@ internal class BetterPlayer(
             parametersBuilder.setMaxVideoBitrate(Int.MAX_VALUE)
         }
         trackSelector.setParameters(parametersBuilder)
+        Log.d("ExoPlayer ------>15 ", "setTrackParameters")
     }
 
     fun seekTo(location: Int) {
+        Log.d("ExoPlayer ------>16 ", "seekTo")
         exoPlayer?.seekTo(location.toLong())
     }
 
@@ -732,11 +770,13 @@ internal class BetterPlayer(
 
     private fun sendInitialized() {
         if (isInitialized) {
+            Log.d("ExoPlayer ------>16 ", "sendInitialized")
             val event: MutableMap<String, Any?> = HashMap()
             event["event"] = "initialized"
             event["key"] = key
             event["duration"] = getDuration()
             if (exoPlayer?.videoFormat != null) {
+                Log.d("ExoPlayer ------>17 ", "videoFormat!=null")
                 val videoFormat = exoPlayer.videoFormat
                 var width = videoFormat?.width
                 var height = videoFormat?.height
@@ -750,6 +790,7 @@ internal class BetterPlayer(
                 event["height"] = height
             }
             eventSink.success(event)
+            Log.d("ExoPlayer ------>18 ", "sendInitialized success")
         }
     }
 
@@ -804,8 +845,10 @@ internal class BetterPlayer(
 
     fun setAudioTrack(name: String, index: Int) {
         try {
+            Log.d("ExoPlayer ------>19 ", "setAudioTrack")
             val mappedTrackInfo = trackSelector.currentMappedTrackInfo
             if (mappedTrackInfo != null) {
+                Log.d("ExoPlayer ------>20 ", "setAudioTrack")
                 for (rendererIndex in 0 until mappedTrackInfo.rendererCount) {
                     if (mappedTrackInfo.getRendererType(rendererIndex) != C.TRACK_TYPE_AUDIO) {
                         continue
@@ -849,13 +892,16 @@ internal class BetterPlayer(
                 }
             }
         } catch (exception: Exception) {
+            Log.d("ExoPlayer ------>21 ", "setAudioTrack Error")
             Log.e(TAG, "setAudioTrack failed$exception")
         }
     }
 
     private fun setAudioTrack(rendererIndex: Int, groupIndex: Int) {
         val mappedTrackInfo = trackSelector.currentMappedTrackInfo
+        Log.d("ExoPlayer ------>22 ", "setAudioTrack ")
         if (mappedTrackInfo != null) {
+            Log.d("ExoPlayer ------>23 ", "setAudioTrack ")
             val builder = trackSelector.parameters.buildUpon()
                 .setRendererDisabled(rendererIndex, false)
                 .addOverride(
@@ -876,10 +922,12 @@ internal class BetterPlayer(
         event["event"] = "seek"
         event["position"] = positionMs
         eventSink.success(event)
+        Log.d("ExoPlayer ------>23 ", "sendSeekToEvent ")
     }
 
     fun setMixWithOthers(mixWithOthers: Boolean) {
         setAudioAttributes(exoPlayer, mixWithOthers)
+        Log.d("ExoPlayer ------>24 ", "setMixWithOthers ")
     }
 
     fun dispose() {
@@ -892,6 +940,7 @@ internal class BetterPlayer(
         eventChannel.setStreamHandler(null)
         surface?.release()
         exoPlayer?.release()
+        Log.d("ExoPlayer ------>25 ", "dispose ")
     }
 
     override fun equals(other: Any?): Boolean {
