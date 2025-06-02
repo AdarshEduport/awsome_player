@@ -24,7 +24,7 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
       BetterPlayerDataSourceType.network,
       bufferingConfiguration: BetterPlayerBufferingConfiguration(
         cleanInit:true ,
-        useSWOnly: true
+        // useSWOnly: true
       ),
       
       Constants.hlsTestStreamUrl,
