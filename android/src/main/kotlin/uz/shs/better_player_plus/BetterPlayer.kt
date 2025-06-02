@@ -398,9 +398,9 @@ internal class BetterPlayer(
                 setUseStopAction(false)
             }
 
-            setupMediaSession(context)?.let {
-                setMediaSessionToken(it.sessionToken)
-            }
+        setupMediaSession(context)?.let { mediaSession ->
+            //setMediaSessionToken(mediaSession.token)
+          }
         }
 
         refreshHandler = Handler(Looper.getMainLooper())
@@ -683,15 +683,18 @@ internal class BetterPlayer(
         }
     }
 
-    @Suppress("DEPRECATION")
     private fun setAudioAttributes(exoPlayer: ExoPlayer?, mixWithOthers: Boolean) {
-        val audioComponent = exoPlayer?.audioComponent ?: return
-        audioComponent.setAudioAttributes(
-            AudioAttributes.Builder().setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).build(),
-            !mixWithOthers
-        )
-
-    }
+    exoPlayer ?: return
+    
+    val audioAttributes = AudioAttributes.Builder()
+        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+        .setUsage(C.USAGE_MEDIA)
+        .setAllowedCapturePolicy(C.ALLOW_CAPTURE_BY_NONE) // Optional: prevent capture
+        .build()
+    
+    // Handle focus request separately if needed
+    exoPlayer.setAudioAttributes(audioAttributes, !mixWithOthers)
+}
 
     fun play() {
 
