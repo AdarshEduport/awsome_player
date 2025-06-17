@@ -24,13 +24,16 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
       'https://cdn.radiantmediatechs.com/rmp/media/samples-for-rmp-site/04052024-lac-de-bimont/hls/playlist.m3u8',
       // Constants.hlsTestStreamUrl,
       useAsmsSubtitles: true,
+      bufferingConfiguration: BetterPlayerBufferingConfiguration(
+        
+      ),
       videoFormat: BetterPlayerVideoFormat.hls
     );
     _betterPlayerController = BetterPlayerController(betterPlayerConfiguration);
     _betterPlayerController.setupDataSource(dataSource);
     _betterPlayerController.addEventsListener((e){
       if(e.betterPlayerEventType==BetterPlayerEventType.analytics){
- log('EVENT----${e.betterPlayerEventType}==${e.parameters}');
+        log('EVENT----${e.betterPlayerEventType}==${e.parameters}');
       }
      
     });

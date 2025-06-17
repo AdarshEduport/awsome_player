@@ -71,6 +71,7 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
+import androidx.media3.exoplayer.util.EventLogger
 import java.io.File
 import java.lang.Exception
 import java.lang.IllegalStateException
@@ -519,67 +520,7 @@ internal class BetterPlayer(
             }
         })
 
-        exoPlayer?.addAnalyticsListener(object : AnalyticsListener {
-            
-            override fun onVideoCodecError(
-                eventTime: AnalyticsListener.EventTime,
-                videoCodecError: Exception
-            ) {
-                Log.d("ExoPlayer Decoder Error", "Decoder Format: ${videoCodecError}, x${eventTime}")
-
-                super.onVideoCodecError(eventTime, videoCodecError)
-            }
-
-            override fun onAudioCodecError(
-                eventTime: AnalyticsListener.EventTime,
-                audioCodecError: Exception
-            ) {
-                Log.d("ExoPlayer Decoder audio Error", "errorDecoder Format: ${audioCodecError}, x${eventTime}")
-                super.onAudioCodecError(eventTime, audioCodecError)
-            }
-            override fun onAudioDecoderInitialized(
-                eventTime: AnalyticsListener.EventTime,
-                decoderName: String,
-                initializedTimestampMs: Long,
-                initializationDurationMs: Long
-            ) {
-                val event: MutableMap<String, Any> = HashMap()
-                event["event"] = "analytics"
-//                event["values"] = mapOf("decoderName" to decoderName)
-                eventSink.success(event)
-                Log.d("ExoPlayer Decoder -audio", "initDecoder name: ${decoderName}, x${eventTime}")
-                super.onAudioDecoderInitialized(
-                    eventTime,
-                    decoderName,
-                    initializedTimestampMs,
-                    initializationDurationMs
-                )
-            }
-
-            override fun onVideoDecoderInitialized(
-                eventTime: AnalyticsListener.EventTime,
-                decoderName: String,
-                initializedTimestampMs: Long,
-                initializationDurationMs: Long
-            ) {
-                val event: MutableMap<String, Any> = HashMap()
-                event["event"] = "analytics"
-//                event["values"] = mapOf("decoderName" to decoderName)
-                eventSink.success(event)
-
-
-
-                Log.i("ExoPlayer Decoder", "Decoder init name: ${decoderName}, x${eventTime}")
-                super.onVideoDecoderInitialized(
-                    eventTime,
-                    decoderName,
-                    initializedTimestampMs,
-                    initializationDurationMs
-                )
-            }
-
-
-        })
+        exoPlayer?.addAnalyticsListener(EventLogger())
         
         val reply: MutableMap<String, Any> = HashMap()
         reply["textureId"] = textureEntry.id()
