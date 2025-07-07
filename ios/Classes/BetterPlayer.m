@@ -522,17 +522,19 @@ static inline CGFloat radiansToDegrees(CGFloat radians) {
     NSLog(@"Player rate before seek: %f", _player.rate);
     ///When player is playing, pause video, seek to new position and start again. This will prevent issues with seekbar jumps.
     bool wasPlaying = _isPlaying;
-    if (wasPlaying){
-        [_player pause];
-    }
+    // if (wasPlaying){
+    //     [_player pause];
+    // }
 
     [_player seekToTime:CMTimeMake(location, 1000)
         toleranceBefore:kCMTimeZero
          toleranceAfter:kCMTimeZero
       completionHandler:^(BOOL finished){
-        if (wasPlaying){
-              NSLog(@"Player rate was playing: %f", _playerRate);
-            _player.rate = _playerRate;
+
+        if (finished && wasPlaying){   
+         NSLog(@"Player rate =====> playing: %f", _playerRate);       
+            // _player.rate = _playerRate;
+             [_player play];
         }
     }];
 
