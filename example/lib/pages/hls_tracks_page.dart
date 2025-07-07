@@ -16,6 +16,9 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
         BetterPlayerConfiguration(
       aspectRatio: 16 / 9,
       fit: BoxFit.contain,
+      controlsConfiguration: BetterPlayerControlsConfiguration(
+       playerTheme: BetterPlayerTheme.material,
+      ),
     );
     BetterPlayerDataSource dataSource = BetterPlayerDataSource(
       BetterPlayerDataSourceType.network,
