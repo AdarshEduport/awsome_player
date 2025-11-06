@@ -1,11 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:awesome_video_player/awesome_video_player.dart';
 
 import 'dart:async';
 
 import 'package:awesome_video_player/src/video_player/video_player.dart';
-
 
 class AwsomePlayerControls extends StatefulWidget {
   /// Callback for visibility changes
@@ -44,7 +42,6 @@ class _CustomPlayerControlsState extends State<AwsomePlayerControls> {
   }
 
   void _initialize() {
-  
     _videoPlayerController?.addListener(_updateState);
     _updateState();
 
@@ -158,9 +155,7 @@ class _CustomPlayerControlsState extends State<AwsomePlayerControls> {
     final position = controller.value.position;
     final seekTo = position + Duration(seconds: 10 * multiplier);
     widget.betterPlayerController.seekTo(seekTo);
-    
   }
-
 
   void _onRewind({int multiplier = 1}) {
     final controller = _videoPlayerController;
@@ -171,7 +166,6 @@ class _CustomPlayerControlsState extends State<AwsomePlayerControls> {
     final seekTo = position - Duration(seconds: 10 * multiplier);
     widget.betterPlayerController
         .seekTo(seekTo.isNegative ? Duration.zero : seekTo);
-    
   }
 
   void _onProgressBarDragStart() {
@@ -181,8 +175,6 @@ class _CustomPlayerControlsState extends State<AwsomePlayerControls> {
   void _onProgressBarDragEnd() {
     _startHideTimer();
   }
-
-
 
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -196,14 +188,15 @@ class _CustomPlayerControlsState extends State<AwsomePlayerControls> {
   }
 
   String trimError(String data) {
-      data =
-          data.replaceAll('androidx.media3.exoplayer.ExoPlaybackException', '');
-      if (data.length >= 50) {
-        return data.substring(0, 50);
-      } else {
-        return data;
-      }
+    data =
+        data.replaceAll('androidx.media3.exoplayer.ExoPlaybackException', '');
+    if (data.length >= 50) {
+      return data.substring(0, 50);
+    } else {
+      return data;
     }
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = _videoPlayerController;
@@ -212,21 +205,19 @@ class _CustomPlayerControlsState extends State<AwsomePlayerControls> {
     final bool isLoading =
         controller?.value.isBuffering == true || !isInitialized;
     final size = MediaQuery.of(context).size;
-    bool _hasError =_latestValue?.hasError==true;
-    String _errorMessage =trimError( _latestValue?.errorDescription??'Error');
+    bool _hasError = _latestValue?.hasError == true;
+    String _errorMessage = trimError(_latestValue?.errorDescription ?? 'Error');
 
     final bool isFullscreen = widget.betterPlayerController.isFullScreen;
-  
 
-    if(_hasError){
-      return
-      SafeArea(
-          top: false,
-      bottom: false,
+    if (_hasError) {
+      return SafeArea(
+        top: false,
+        bottom: false,
         child: CustomBetterPlayerErrorWidget(
-                controller: widget.betterPlayerController,
-                errorMessage: _errorMessage,
-              ),
+          controller: widget.betterPlayerController,
+          errorMessage: _errorMessage,
+        ),
       );
     }
     return SafeArea(
@@ -234,207 +225,208 @@ class _CustomPlayerControlsState extends State<AwsomePlayerControls> {
       bottom: false,
       child: GestureDetector(
         onTap: _toggleControlsVisibility,
-        child: AbsorbPointer(
-          absorbing: !_controlsVisible,
-          child: Stack(
-            children: [
-              // Main video content is handled by BetterPlayer itself
-        
-              // Controls layer
-              AnimatedSwitcher(
+        child: Stack(
+          children: [
+            // Main video content is handled by BetterPlayer itself
+
+            // Controls layer
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: AnimatedOpacity(
+                opacity: _controlsVisible ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 300),
-                child: Visibility(
-                  visible: _controlsVisible,
-                  child: Container(
-                    color: Colors.black.withOpacity(0.4),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Top bar
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  color: Colors.black.withOpacity(0.4),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Top bar
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.settings,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  useSafeArea: true,
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (context) =>
+                                      VideoSettingsBottomSheet(
+                                    betterPlayerController:
+                                        widget.betterPlayerController,
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                widget.betterPlayerController.isFullScreen
+                                    ? Icons.fullscreen_exit
+                                    : Icons.fullscreen,
+                                color: Colors.white,
+                              ),
+                              onPressed: () => widget.betterPlayerController
+                                  .toggleFullScreen(),
+                            ),
+                          ],
+                        ),
+                      ),
+            
+                      // Middle section with play/pause and seek buttons
+                      Expanded(
+                        child: SizedBox(
+                          width: isFullscreen ? size.width * .6 : null,
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: isFullscreen
+                                ? MainAxisAlignment.spaceBetween
+                                : MainAxisAlignment.center,
                             children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.settings,
-                                  color: Colors.white,
+                              Flexible(
+                                child: AnimatedSkipButton(
+                                  isBackward: true,
+                                  iconData: Icons
+                                      .keyboard_double_arrow_left_rounded,
+                                  iconColor:
+                                      _controlsConfiguration.iconsColor,
+                                  skipDurationInSeconds: 10,
+                                  onSkip: (count) {
+                                    _onRewind(multiplier: count);
+                                  },
                                 ),
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                    useSafeArea: true,
-                                    context: context,
-                                    isScrollControlled: true,
-                                    backgroundColor: Colors.transparent,
-                                    builder: (context) =>
-                                        VideoSettingsBottomSheet(
-                                      betterPlayerController:
-                                          widget.betterPlayerController,
-                                    ),
-                                  );
-                                },
                               ),
-                              IconButton(
-                                icon: Icon(
-                                  widget.betterPlayerController.isFullScreen
-                                      ? Icons.fullscreen_exit
-                                      : Icons.fullscreen,
-                                  color: Colors.white,
+                              SizedBox(
+                                  width: 70,
+                                  height: 70,
+                                  child: isLoading
+                                      ? const SizedBox(
+                                          width: 15,
+                                          height: 15,
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        )
+                                      : AnimatedPlayPauseIcon(
+                                          color: Colors.white,
+                                          size: 50,
+                                          isPlaying: isPlaying,
+                                          onPressed: _onPlayPause,
+                                        )),
+                              Flexible(
+                                child: AnimatedSkipButton(
+                                  isBackward: false,
+                                  iconData: Icons
+                                      .keyboard_double_arrow_right_rounded,
+                                  iconColor:
+                                      _controlsConfiguration.iconsColor,
+                                  skipDurationInSeconds: 10,
+                                  onSkip: (count) {
+                                    _onForward(multiplier: count);
+                                  },
                                 ),
-                                onPressed: () => widget.betterPlayerController
-                                    .toggleFullScreen(),
-                              ),
+                              )
                             ],
                           ),
                         ),
-        
-                        // Middle section with play/pause and seek buttons
-                        Expanded(
-                          child: SizedBox(
-                            width: isFullscreen ? size.width * .6 : null,
-                            child: Row(
-                              mainAxisAlignment: isFullscreen
-                                  ? MainAxisAlignment.spaceBetween
-                                  : MainAxisAlignment.center,
-                              children: [
-                                Flexible(
-                                  child: AnimatedSkipButton(
-                                    isBackward: true,
-                                    iconData:
-                                        Icons.keyboard_double_arrow_left_rounded,
-                                    iconColor: _controlsConfiguration.iconsColor,
-                                    skipDurationInSeconds: 10,
-                                    onSkip: (count) {
-                                      _onRewind(multiplier: count);
-                                    },
+                      ),
+            
+                      // Bottom bar with progress
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      // Current time
+                                      Flexible(
+                                        child: Text(
+                                          isInitialized
+                                              ? _formatDuration(
+                                                  controller!.value.position)
+                                              : '00:00',
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                      ),
+            
+                                      // Duration
+                                      Text(
+                                        ' / ${isInitialized ? _formatDuration(controller!.value.duration ?? Duration.zero) : '00:00'}',
+                                        style: const TextStyle(
+                                            color: Colors.white70),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                SizedBox(
-                                    width: 70,
-                                    height: 70,
-                                    child: isLoading
-                                        ? const SizedBox(
-                                            width: 15,
-                                            height: 15,
-                                            child: FittedBox(
-                                              fit: BoxFit.scaleDown,
-                                              child: CircularProgressIndicator(
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          )
-                                        : AnimatedPlayPauseIcon(
-                                            color: Colors.white,
-                                            size: 50,
-                                            isPlaying: isPlaying,
-                                            onPressed: _onPlayPause,
-                                          )),
-                                Flexible(
-                                  child: AnimatedSkipButton(
-                                    isBackward: false,
-                                    iconData:
-                                        Icons.keyboard_double_arrow_right_rounded,
-                                    iconColor: _controlsConfiguration.iconsColor,
-                                    skipDurationInSeconds: 10,
-                                    onSkip: (count) {
-                                      _onForward(multiplier: count);
+                              ),
+            
+                              // Progress bar
+                              Expanded(
+                                child: Container(
+                                  height: 30,
+                                  margin: EdgeInsets.only(
+                                      bottom: widget.betterPlayerController
+                                              .isFullScreen
+                                          ? 30
+                                          : 0),
+                                  alignment: Alignment.bottomCenter,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  child: HotStarProgressBar(
+                                    widget.betterPlayerController
+                                        .videoPlayerController,
+                                    widget.betterPlayerController,
+                                    onDragStart: () {
+                                      _hideTimer?.cancel();
                                     },
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-        
-                        // Bottom bar with progress
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Flexible(
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        // Current time
-                                        Flexible(
-                                          child: Text(
-                                            isInitialized
-                                                ? _formatDuration(
-                                                    controller!.value.position)
-                                                : '00:00',
-                                            style: const TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                          
-                                        // Duration
-                                        Text(
-                                          ' / ${isInitialized ? _formatDuration(controller!.value.duration ?? Duration.zero) : '00:00'}',
-                                          style: const TextStyle(color: Colors.white70),
-                                        ),
-                                      ],
-                                    ),
+                                    onDragEnd: () {
+                                      _startHideTimer();
+                                    },
+                                    onTapDown: () {
+                                      _cancelAndRestartTimer();
+                                    },
+                                    colors: BetterPlayerProgressColors(
+                                        playedColor: Colors.redAccent,
+                                        handleColor: _controlsConfiguration
+                                            .progressBarHandleColor,
+                                        bufferedColor: Colors.white,
+                                        backgroundColor: Colors.grey),
                                   ),
                                 ),
-        
-                                // Progress bar
-                                Expanded(
-                                  child: Container(
-                                    height: 30,
-                                    margin: EdgeInsets.only(
-                                        bottom: widget
-                                                .betterPlayerController.isFullScreen
-                                            ? 30
-                                            : 0),
-                                    alignment: Alignment.bottomCenter,
-                                    padding:
-                                        const EdgeInsets.symmetric(horizontal: 12),
-                                    child: HotStarProgressBar(
-                                      widget.betterPlayerController
-                                          .videoPlayerController,
-                                      widget.betterPlayerController,
-                                      onDragStart: () {
-                                        _hideTimer?.cancel();
-                                      },
-                                      onDragEnd: () {
-                                        _startHideTimer();
-                                      },
-                                      onTapDown: () {
-                                        _cancelAndRestartTimer();
-                                      },
-                                      colors: BetterPlayerProgressColors(
-                                          playedColor: Colors.redAccent,
-                                          handleColor: _controlsConfiguration
-                                              .progressBarHandleColor,
-                                          bufferedColor: Colors.white,
-                                          backgroundColor: Colors.grey),
-                                    ),
-                                  ),
-                                )
-        
-                                // Time and volume
-                              ],
-                            ),
+                              )
+            
+                              // Time and volume
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
 
 class Throttler {
   final Duration interval;
@@ -444,14 +436,15 @@ class Throttler {
 
   bool run(Function() callback) {
     final now = DateTime.now();
-    
+
     // If this is the first run or if enough time has passed since last execution
-    if (_lastExecutionTime == null || now.difference(_lastExecutionTime!) > interval) {
+    if (_lastExecutionTime == null ||
+        now.difference(_lastExecutionTime!) > interval) {
       _lastExecutionTime = now;
       callback();
       return true; // Function was executed
     }
-    
+
     return false; // Function was not executed (throttled)
   }
 }
@@ -626,7 +619,6 @@ class _VideoProgressBarState extends State<HotStarProgressBar> {
         }
       }
     }
-    
   }
 
   void onFinishedLastSeek() {
@@ -847,7 +839,16 @@ class VideoSettingsBottomSheet extends StatefulWidget {
 class _VideoSettingsBottomSheetState extends State<VideoSettingsBottomSheet>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final List<double> _speedOptions = [0.25,0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
+  final List<double> _speedOptions = [
+    0.25,
+    0.5,
+    0.75,
+    1.0,
+    1.25,
+    1.5,
+    1.75,
+    2.0
+  ];
 
   @override
   void initState() {
@@ -866,8 +867,7 @@ class _VideoSettingsBottomSheetState extends State<VideoSettingsBottomSheet>
     final int height = track.height ?? 0;
 
     final resolution = width > height ? height : width;
-    final resolutionName =
-        resolution == 0 ? "Auto" : '${resolution}p';
+    final resolutionName = resolution == 0 ? "Auto" : '${resolution}p';
     final String trackName = preferredName ?? resolutionName;
     // "${width}x$height ${BetterPlayerUtils.formatBitrate(bitrate)} $mimeType";
 
@@ -1003,11 +1003,11 @@ class _VideoSettingsBottomSheetState extends State<VideoSettingsBottomSheet>
         itemCount: _speedOptions.length,
         itemBuilder: (context, index) {
           final speed = _speedOptions[index];
-          final bool isSelected =
-              widget.betterPlayerController.videoPlayerController!.value.speed ==
-                  speed;
+          final bool isSelected = widget
+                  .betterPlayerController.videoPlayerController!.value.speed ==
+              speed;
           final displayText = speed == 1.0 ? "Normal" : "${speed}x";
-      
+
           return ListTile(
             title: Text(
               displayText,
@@ -1179,9 +1179,11 @@ class CustomBetterPlayerErrorWidget extends StatelessWidget {
   }
 }
 
-
 class StretchingScrollWidget extends StatelessWidget {
-  const StretchingScrollWidget({super.key, required this.child, this.axisDirection = AxisDirection.down});
+  const StretchingScrollWidget(
+      {super.key,
+      required this.child,
+      this.axisDirection = AxisDirection.down});
   final AxisDirection axisDirection;
   final Widget child;
 
@@ -1192,7 +1194,8 @@ class StretchingScrollWidget extends StatelessWidget {
       child: ScrollConfiguration(
         behavior: /* Platform.isIOS
             ?  */
-            const ScrollBehavior().copyWith(physics: const ClampingScrollPhysics(), overscroll: false),
+            const ScrollBehavior().copyWith(
+                physics: const ClampingScrollPhysics(), overscroll: false),
         // : ScrollConfiguration.of(context).copyWith(overscroll: false),
         child: child,
       ),

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:awesome_video_player/awesome_video_player.dart';
 import 'package:awesome_video_player_example/constants.dart';
+import 'package:awesome_video_player_example/pages/custom_controls/hotstar_control.dart';
 import 'package:flutter/material.dart';
 
 class HlsTracksPage extends StatefulWidget {
@@ -19,8 +20,16 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
           autoPlay: true,
       aspectRatio: 16 / 9,
       expandToFill: true,
-      controlsConfiguration: BetterPlayerControlsConfiguration(
-          playerTheme: BetterPlayerTheme.material),
+      controlsConfiguration:  BetterPlayerControlsConfiguration(
+        enableAudioTracks: false,
+        playerTheme: BetterPlayerTheme.custom,
+        customControlsBuilder: (BetterPlayerController playerController,
+                dynamic Function(bool) onControlsVisibilityChanged) =>
+            AwsomePlayerControls(
+          betterPlayerController: playerController,
+          onControlsVisibilityChanged: onControlsVisibilityChanged,
+        ),
+      ),
       fit: BoxFit.contain,
     );
     BetterPlayerDataSource dataSource = BetterPlayerDataSource(
