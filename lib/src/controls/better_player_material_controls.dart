@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:awesome_video_player/src/configuration/better_player_controls_configuration.dart';
+import 'package:awesome_video_player/src/configuration/interctive_viewer.dart';
 import 'package:awesome_video_player/src/controls/better_player_clickable_widget.dart';
 import 'package:awesome_video_player/src/controls/better_player_controls_state.dart';
 import 'package:awesome_video_player/src/controls/better_player_material_progress_bar.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 class BetterPlayerMaterialControls extends StatefulWidget {
   ///Callback used to send information if player bar is hidden or not
   final Function(bool visbility) onControlsVisibilityChanged;
+  final Widget? child;
 
   ///Controls config
   final BetterPlayerControlsConfiguration controlsConfiguration;
@@ -24,6 +26,7 @@ class BetterPlayerMaterialControls extends StatefulWidget {
     Key? key,
     required this.onControlsVisibilityChanged,
     required this.controlsConfiguration,
+    this.child,
   }) : super(key: key);
 
   @override
@@ -73,6 +76,7 @@ class _BetterPlayerMaterialControlsState
       );
     }
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () {
         if (BetterPlayerMultipleGestureDetector.of(context) != null) {
           BetterPlayerMultipleGestureDetector.of(context)!.onTap?.call();
@@ -92,25 +96,32 @@ class _BetterPlayerMaterialControlsState
           BetterPlayerMultipleGestureDetector.of(context)!.onLongPress?.call();
         }
       },
-      child: AbsorbPointer(
-        absorbing: controlsNotVisible,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            if (_wasLoading)
-              Center(child: _buildLoadingWidget())
-            else
-              _buildHitArea(),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: _buildTopBar(),
-            ),
-            Positioned(bottom: 0, left: 0, right: 0, child: _buildBottomBar()),
-            _buildNextVideoWidget(),
-          ],
-        ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (_wasLoading)
+            Center(child: _buildLoadingWidget())
+          else
+            // InteractiveViewerWidget(
+            //   onInteractionStart: (details) {
+            //     if (details.pointerCount == 1) {
+            //       controlsNotVisible == true
+            //           ? cancelAndRestartTimer()
+            //           : changePlayerControlsNotVisible(true);
+            //     }
+            //   },
+            //   child: widget.child ?? SizedBox(),
+            // ),
+            _buildHitArea(),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: _buildTopBar(),
+          ),
+          Positioned(bottom: 0, left: 0, right: 0, child: _buildBottomBar()),
+          _buildNextVideoWidget(),
+        ],
       ),
     );
   }
@@ -154,8 +165,10 @@ class _BetterPlayerMaterialControlsState
               .videoPlayerController!.value.errorDescription);
     } else {
       final betterPlayerError = _betterPlayerController!
-              .videoPlayerController!.value.errorDescription;
-      final errorDesc= Platform.isAndroid && betterPlayerError!=null?   betterPlayerError:_betterPlayerController!.translations.generalDefaultError;
+          .videoPlayerController!.value.errorDescription;
+      final errorDesc = Platform.isAndroid && betterPlayerError != null
+          ? betterPlayerError
+          : _betterPlayerController!.translations.generalDefaultError;
       final textStyle = TextStyle(color: _controlsConfiguration.textColor);
       return Center(
         child: Column(
@@ -167,8 +180,7 @@ class _BetterPlayerMaterialControlsState
               size: 42,
             ),
             Text(
-              errorDesc
-            ,
+              errorDesc,
               style: textStyle,
             ),
             if (_controlsConfiguration.enableRetry)
@@ -367,6 +379,14 @@ class _BetterPlayerMaterialControlsState
     if (!betterPlayerController!.controlsEnabled) {
       return const SizedBox();
     }
+    if (controlsNotVisible) {
+      return const SizedBox();
+    }
+    // return Container(
+    //   child: Center(
+    //     child: _buildMiddleRow(),
+    //   ),
+    // );
     return Container(
       child: Center(
         child: AnimatedOpacity(

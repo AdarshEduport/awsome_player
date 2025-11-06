@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:awesome_video_player/awesome_video_player.dart';
 import 'package:awesome_video_player/src/configuration/better_player_controller_event.dart';
+import 'package:awesome_video_player/src/configuration/interctive_viewer.dart';
 import 'package:awesome_video_player/src/controls/better_player_cupertino_controls.dart';
 import 'package:awesome_video_player/src/controls/better_player_material_controls.dart';
 import 'package:awesome_video_player/src/core/better_player_utils.dart';
@@ -130,13 +131,6 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
         fit: StackFit.passthrough,
         children: <Widget>[
           if (placeholderOnTop) _buildPlaceholder(betterPlayerController),
-          Transform.rotate(
-            angle: rotation * pi / 180,
-            child: _BetterPlayerVideoFitWidget(
-              betterPlayerController,
-              betterPlayerController.getFit(),
-            ),
-          ),
           betterPlayerController.betterPlayerConfiguration.overlay ??
               Container(),
           BetterPlayerSubtitlesDrawer(
@@ -146,7 +140,28 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
             playerVisibilityStream: playerVisibilityStreamController.stream,
           ),
           if (!placeholderOnTop) _buildPlaceholder(betterPlayerController),
-          _buildControls(context, betterPlayerController),
+          // Transform.rotate(
+          //   angle: rotation * pi / 180,
+          //   child: _BetterPlayerVideoFitWidget(
+          //     betterPlayerController,
+          //     betterPlayerController.getFit(),
+          //   ),
+          // ),
+          InteractiveViewerWidget(
+            overlay: _buildControls(
+              context,
+              betterPlayerController,
+              SizedBox.shrink()
+             
+              ), 
+            child: Transform.rotate(
+                angle: rotation * pi / 180,
+                child: _BetterPlayerVideoFitWidget(
+                  betterPlayerController,
+                  betterPlayerController.getFit(),
+                ),
+              ) ),
+         
         ],
       ),
     );
@@ -161,6 +176,7 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
   Widget _buildControls(
     BuildContext context,
     BetterPlayerController betterPlayerController,
+    Widget? child,
   ) {
     if (controlsConfiguration.showControls) {
       BetterPlayerTheme? playerTheme = controlsConfiguration.playerTheme;
@@ -177,7 +193,7 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
         return controlsConfiguration.customControlsBuilder!(
             betterPlayerController, onControlsVisibilityChanged);
       } else if (playerTheme == BetterPlayerTheme.material) {
-        return _buildMaterialControl();
+        return _buildMaterialControl(child);
       } else if (playerTheme == BetterPlayerTheme.cupertino) {
         return _buildCupertinoControl();
       }
@@ -186,10 +202,11 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
     return const SizedBox();
   }
 
-  Widget _buildMaterialControl() {
+  Widget _buildMaterialControl(Widget? child) {
     return BetterPlayerMaterialControls(
       onControlsVisibilityChanged: onControlsVisibilityChanged,
       controlsConfiguration: controlsConfiguration,
+      child: child,
     );
   }
 
