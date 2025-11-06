@@ -109,6 +109,21 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
     }
   }
 
+  bool _isInteractiveViewerEnabled(
+      BetterPlayerController betterPlayerController) {
+    bool fullscreenStatus = betterPlayerController
+        .betterPlayerControlsConfiguration
+        .interactiveViewerConfiguration
+        .enabledOnLandscape;
+    bool normalStatus = betterPlayerController.betterPlayerControlsConfiguration
+        .interactiveViewerConfiguration.enabledOnPortrait;
+    if (betterPlayerController.isFullScreen) {
+      return fullscreenStatus;
+    } else {
+      return normalStatus;
+    }
+  }
+
   Container _buildPlayerWithControls(
       BetterPlayerController betterPlayerController, BuildContext context) {
     final configuration = betterPlayerController.betterPlayerConfiguration;
@@ -125,6 +140,7 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
 
     final bool placeholderOnTop =
         betterPlayerController.betterPlayerConfiguration.placeholderOnTop;
+
     // ignore: avoid_unnecessary_containers
     return Container(
       child: Stack(
@@ -140,28 +156,36 @@ class _BetterPlayerWithControlsState extends State<BetterPlayerWithControls> {
             playerVisibilityStream: playerVisibilityStreamController.stream,
           ),
           if (!placeholderOnTop) _buildPlaceholder(betterPlayerController),
-          // Transform.rotate(
-          //   angle: rotation * pi / 180,
-          //   child: _BetterPlayerVideoFitWidget(
-          //     betterPlayerController,
-          //     betterPlayerController.getFit(),
-          //   ),
-          // ),
-          InteractiveViewerWidget(
-            overlay: _buildControls(
-              context,
-              betterPlayerController,
-              SizedBox.shrink()
-             
-              ), 
-            child: Transform.rotate(
-                angle: rotation * pi / 180,
-                child: _BetterPlayerVideoFitWidget(
-                  betterPlayerController,
-                  betterPlayerController.getFit(),
+          Visibility(
+            visible: _isInteractiveViewerEnabled(betterPlayerController),
+            child: InteractiveViewerWidget(
+                maxScale: betterPlayerController
+                    .betterPlayerControlsConfiguration
+                    .interactiveViewerConfiguration
+                    .maxScale,
+                overlay: _buildControls(
+                    context, betterPlayerController, SizedBox.shrink()),
+                child: Transform.rotate(
+                  angle: rotation * pi / 180,
+                  child: _BetterPlayerVideoFitWidget(
+                    betterPlayerController,
+                    betterPlayerController.getFit(),
+                  ),
+                )),
+            replacement: Stack(
+              children: [
+                Transform.rotate(
+                  angle: rotation * pi / 180,
+                  child: _BetterPlayerVideoFitWidget(
+                    betterPlayerController,
+                    betterPlayerController.getFit(),
+                  ),
                 ),
-              ) ),
-         
+                _buildControls(
+                    context, betterPlayerController, SizedBox.shrink()),
+              ],
+            ),
+          ),
         ],
       ),
     );

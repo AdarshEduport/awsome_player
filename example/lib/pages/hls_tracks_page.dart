@@ -22,6 +22,9 @@ class _HlsTracksPageState extends State<HlsTracksPage> {
       expandToFill: true,
       controlsConfiguration:  BetterPlayerControlsConfiguration(
         enableAudioTracks: false,
+        interactiveViewerConfiguration:InteractiveViewerConfiguration(
+          enabledOnPortrait: true,
+        ),
         playerTheme: BetterPlayerTheme.custom,
         customControlsBuilder: (BetterPlayerController playerController,
                 dynamic Function(bool) onControlsVisibilityChanged) =>

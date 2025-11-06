@@ -1,4 +1,5 @@
 import 'package:awesome_video_player/awesome_video_player.dart';
+import 'package:awesome_video_player/src/configuration/interactive_viewer_configuration.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -6,6 +7,11 @@ import 'package:flutter/material.dart';
 ///of controls. Used in BetterPlayerConfiguration. Configuration applies only
 ///for player displayed in app, not in notification or PiP mode.
 class BetterPlayerControlsConfiguration {
+
+
+  ///Interactive viewer configuration
+  final InteractiveViewerConfiguration interactiveViewerConfiguration;
+
   ///Color of the control bars
   final Color controlBarColor;
 
@@ -161,7 +167,11 @@ class BetterPlayerControlsConfiguration {
   ///Color of text in bottom modal sheet used for overflow menu items.
   final Color overflowModalTextColor;
 
+
+  
+
   const BetterPlayerControlsConfiguration({
+    this.interactiveViewerConfiguration = const InteractiveViewerConfiguration(),
     this.controlBarColor = Colors.black87,
     this.textColor = Colors.white,
     this.iconsColor = Colors.white,
