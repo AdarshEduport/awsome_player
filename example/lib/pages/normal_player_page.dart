@@ -17,6 +17,7 @@ class _NormalPlayerPageState extends State<NormalPlayerPage> {
     BetterPlayerConfiguration betterPlayerConfiguration =
         BetterPlayerConfiguration(
       aspectRatio: 16 / 9,
+      allowedScreenSleep: false,
       fit: BoxFit.contain,
       autoPlay: true,
       looping: true,

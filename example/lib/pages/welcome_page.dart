@@ -45,6 +45,7 @@ class _WelcomePageState extends State<WelcomePage> {
     _saveAssetVideoToFile();
     _saveAssetEncryptVideoToFile();
     _saveLogoToFile();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.initState();
   }
 
