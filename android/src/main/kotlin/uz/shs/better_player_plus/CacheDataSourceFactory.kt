@@ -19,14 +19,13 @@ internal class CacheDataSourceFactory(
         val betterPlayerCache = BetterPlayerCache.createCache(context, maxCacheSize)
             ?: throw IllegalStateException("Cache can't be null.")
 
-        return CacheDataSource(
-            betterPlayerCache,
-            defaultDatasourceFactory?.createDataSource(),
-            FileDataSource(),
-            CacheDataSink(betterPlayerCache, maxFileSize),
-            CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR,
-            null
-        )
+        return CacheDataSource.Factory()
+            .setCache(betterPlayerCache)
+            .setUpstreamDataSourceFactory(defaultDatasourceFactory)
+            .setCacheReadDataSourceFactory(FileDataSource.Factory())
+            .setCacheWriteDataSinkFactory(CacheDataSink.Factory().setCache(betterPlayerCache).setFragmentSize(maxFileSize))
+            .setFlags(CacheDataSource.FLAG_BLOCK_ON_CACHE or CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+            .createDataSource()
     }
 
     init {

@@ -339,7 +339,9 @@ internal class BetterPlayer(
             }
 
             setupMediaSession(context)?.let {
-                setMediaSessionToken(it.sessionToken)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    setMediaSessionToken(it.sessionToken.token as android.media.session.MediaSession.Token)
+                }
             }
         }
 
@@ -403,7 +405,7 @@ internal class BetterPlayer(
             if (lastPathSegment == null) {
                 lastPathSegment = ""
             }
-            type = Util.inferContentTypeForExtension(lastPathSegment)
+            type = Util.inferContentType(uri)
         } else {
             type = when (formatHint) {
                 FORMAT_SS -> C.CONTENT_TYPE_SS
@@ -542,12 +544,10 @@ internal class BetterPlayer(
 
     @Suppress("DEPRECATION")
     private fun setAudioAttributes(exoPlayer: ExoPlayer?, mixWithOthers: Boolean) {
-        val audioComponent = exoPlayer?.audioComponent ?: return
-        audioComponent.setAudioAttributes(
+        exoPlayer?.setAudioAttributes(
             AudioAttributes.Builder().setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).build(),
             !mixWithOthers
         )
-
     }
 
     fun play() {
@@ -621,15 +621,14 @@ internal class BetterPlayer(
             event["event"] = "initialized"
             event["key"] = key
             event["duration"] = getDuration()
-            if (exoPlayer?.videoFormat != null) {
-                val videoFormat = exoPlayer.videoFormat
-                var width = videoFormat?.width
-                var height = videoFormat?.height
-                val rotationDegrees = videoFormat?.rotationDegrees
+            exoPlayer?.videoSize?.let { videoSize ->
+                var width = videoSize.width
+                var height = videoSize.height
+                val rotationDegrees = videoSize.unappliedRotationDegrees
                 // Switch the width/height if video was taken in portrait mode
                 if (rotationDegrees == 90 || rotationDegrees == 270) {
-                    width = exoPlayer.videoFormat?.height
-                    height = exoPlayer.videoFormat?.width
+                    width = videoSize.height
+                    height = videoSize.width
                 }
                 event["width"] = width
                 event["height"] = height
