@@ -54,4 +54,8 @@ class Constants {
       "https://bitmovin-a.akamaihd.net/content/sintel/sintel.mpd";
   static String segmentedSubtitlesHlsUrl =
       "https://eng-demo.cablecast.tv/segmented-captions/vod.m3u8";
+
+
+  static String fmp4 = 'https://assets-dev.eduport.app/live/59bedadd-554d-400d-959b-d81b8d4dfa5e/index.m3u8';
+  static String fmp4_2 = 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8';
 }
